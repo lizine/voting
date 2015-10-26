@@ -3,13 +3,7 @@ import {List, Map} from 'immutable';
 export function setEntries(state,entries){
 	return state.set('entries', List(entries));
 }
-export function next(sate) {
-	const entries = state.get('entries');
-	return state.merge({
-		vote: Map({pair: entries.take(2)}),
-		entries : entries.skip(2)
-	});
-}
+
 export function vote (state, entry){
 	return state.updateIn(
 	['vote', 'tally', entry],
@@ -35,8 +29,16 @@ function getWinners(vote){
 }
 export function next(state){
 	const entries = state.get('entries').concat(getWinners(state.get('vote')));
-	return state.merge({
+
+	if(entries.size === 1){
+		return state.remove('vote').remove('entries').set('winner', entries.first());
+	} else {
+		return state.merge({
 		vote: Map({pair: entries.take(2)}),
 		entries: entries.skip(2)
-	});
+		});
+
+	}
+
+	
 }
