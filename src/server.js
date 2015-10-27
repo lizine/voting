@@ -5,5 +5,13 @@ export default function startServer(){
 
 	store.subscribe(
 		() => io.emit('state', store.getState().toJS())
-		);
+	);
+
+	 //listen new connections and emit current state
+	io.on('connection', (socket) => {
+		socket.emit('state', store.getState().toJS());
+
+		//let clients emit action events
+		socket.on('action', store.dispatch.bind(store));
+	});
 }
